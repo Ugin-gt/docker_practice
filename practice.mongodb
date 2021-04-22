@@ -1,0 +1,107 @@
+
+// Select the database to use.
+use('my_mongo');
+
+// The drop() command destroys all data from a collection.
+// Make sure you run it against the correct database and collection.
+db.sales.drop();
+
+// Insert a few documents into the sales collection.
+db.sales.insertMany([
+  { '_id': 1, 'item': 'abc', 'price': 10, 'quantity': 2, 'date': new Date('2014-03-01T08:00:00Z') },
+  { '_id': 2, 'item': 'jkl', 'price': 20, 'quantity': 1, 'date': new Date('2014-03-01T09:00:00Z') },
+  { '_id': 3, 'item': 'xyz', 'price': 5, 'quantity': 10, 'date': new Date('2014-03-15T09:00:00Z') },
+  { '_id': 4, 'item': 'xyz', 'price': 5, 'quantity':  20, 'date': new Date('2014-04-04T11:21:39.736Z') },
+  { '_id': 5, 'item': 'abc', 'price': 10, 'quantity': 10, 'date': new Date('2014-04-04T21:23:13.331Z') },
+  { '_id': 6, 'item': 'def', 'price': 7.5, 'quantity': 5, 'date': new Date('2015-06-04T05:08:13Z') },
+  { '_id': 7, 'item': 'def', 'price': 7.5, 'quantity': 10, 'date': new Date('2015-09-10T08:43:00Z') },
+  { '_id': 8, 'item': 'abc', 'price': 10, 'quantity': 5, 'date': new Date('2016-02-06T20:20:13Z') },
+]);
+
+// Run a find command to view items sold on April 4th, 2014.
+db.sales.find({ date: { $gte: new Date('2014-04-04'), $lt: new Date('2014-04-05') } });
+
+
+const aggregation = [
+  { $match: { date: { $gte: new Date('2014-01-01'), $lt: new Date('2015-01-01') } } },
+  { $group: { _id: '$item', totalSaleAmount: { $sum: { $multiply: [ '$price', '$quantity' ] } } } }
+];
+
+
+db.sales.aggregate(aggregation);
+
+db.createCollection('author', {
+  validator:{
+    $jsonSchema:{
+      bsonType:"object",
+      required:["fullName", "autobiography"],
+      properties:{
+        fullName:{
+          bsonType:"string"},
+        autobiography:{
+             bsonType:"string"
+          },
+      }
+    }
+  }
+})
+
+db.author.insertMany([
+  {'fullName': 'Mark Twain', 'autobiography': 'Twain was raised in Hannibal, Missouri, which later provided the setting for Tom Sawyer and Huckleberry Finn. He served an apprenticeship with a printer and then worked as a typesetter, contributing articles to the newspaper of his older brother Orion Clemens. He later became a riverboat pilot on the Mississippi River before heading west to join Orion in Nevada. He referred humorously to his lack of success at mining, turning to journalism for the Virginia City Territorial Enterprise.[5] His humorous story, "The Celebrated Jumping Frog of Calaveras County", was published in 1865, based on a story that he heard at Angels Hotel in Angels Camp, California, where he had spent some time as a miner. The short story brought international attention and was even translated into French.[6] His wit and satire, in prose and in speech, earned praise from critics and peers, and he was a friend to presidents, artists, industrialists, and European royalty.' },
+   {'fullName': 'Jack London', 'autobiography': 'London was born near Third and Brannan Streets in San Francisco. The house burned down in the fire after the 1906 San Francisco earthquake; the California Historical Society placed a plaque at the site in 1953. Although the family was working class, it was not as impoverished as Londons later accounts claimed.London was largely self-educated.In 1885, London found and read Ouidas long Victorian novel Signa.[16][17] He credited this as the seed of his literary success.[18] In 1886, he went to the Oakland Public Library and found a sympathetic librarian, Ina Coolbrith, who encouraged his learning. (She later became Californias first poet laureate and an important figure in the San Francisco literary community' },])
+
+
+db.createCollection('books', {
+  validator:{
+    $jsonSchema:{
+      bsonType:"object",
+      required:["name", "description","authorId"],
+      properties:{
+        authorId:{
+          bsonType:"objectId"},
+        name:{
+          bsonType:"string"},
+        description:{
+             bsonType:"string"
+          },
+      }
+    }
+  }
+})
+
+
+
+
+
+db.books.insertMany([
+  {'authorId':new ObjectId('60802260df8e841f29d7847e'),'name': 'Adventures of Huckleberry Finn', 'description': ' He served an apprenticeship with a printer and then worked as a typesetter, contributing articles to the newspaper of his older brother Orion Clemens. He later became a riverboat pilot on the Mississippi River before heading west to join Orion in Nevada. He referred humorously to his lack of success at mining, turning to journalism for the Virginia City Territorial Enterprise.[5] His humorous story, "The Celebrated Jumping Frog of Calaveras County", was published in 1865, based on a story that he heard at Angels Hotel in Angels Camp, California, where he had spent some time as a miner. The short story brought international attention and was even translated into French.[6] His wit and satire, in prose and in speech, earned praise from critics and peers, and he was a friend to presidents, artists, industrialists, and European royalty.' },
+  {'authorId':new ObjectId('60802260df8e841f29d7847e'),'name': 'Adventures of Tom Sawyer', 'description': ' He served an apprenticeship with a printer and then worked as a typesetter, contributing articles to the newspaper of his older brother Orion Clemens. He later became a riverboat pilot on the Mississippi River before heading west to join Orion in Nevada. He referred humorously to his lack of success at mining, turning to journalism for the Virginia City Territorial Enterprise.[5] His humorous story, "The Celebrated Jumping Frog of Calaveras County", was published in 1865, based on a story that he heard at Angels Hotel in Angels Camp, California, where he had spent some time as a miner. The short story brought international attention and was even translated into French.[6] His wit and satire, in prose and in speech, earned praise from critics and peers, and he was a friend to presidents, artists, industrialists, and European royalty.' },
+   {'authorId':new ObjectId('60802260df8e841f29d7847f'), 'name': 'The Sea-Wolf', 'description': ' He served an apprenticeship with a printer and then worked as a typesetter, contributing articles to the newspaper of his older brother Orion Clemens. He later became a riverboat pilot on the Mississippi River before heading west to join Orion in Nevada. He referred humorously to his lack of success at mining, turning to journalism for the Virginia City Territorial Enterprise.[5] His humorous story, "The Celebrated Jumping Frog of Calaveras County", was published in 1865, based on a story that he heard at Angels Hotel in Angels Camp, California, where he had spent some time as a miner. The short story brought international attention and was even translated into French.[6] His wit and satire, in prose and in speech, earned praise from critics and peers, and he was a friend to presidents, artists, industrialists, and European royalty.' },
+   {'authorId':new ObjectId('60802260df8e841f29d7847f'), 'name': 'A Son of the Sun', 'description': ' A Son of the Sun is a 1912 novel by Jack London. It is set in the South Pacific at the beginning of the 20th century and consists of eight separate stories. David Grief is a forty-year-old English adventurer who came to the South seas years ago and became rich. As a businessman he owns offices in Sydney, but he is rarely there. Since his wealth spreads over a lot of islands, Grief has some adventures while going among these islands. London depicts the striking panorama of the South seas with adventurers, scoundrels, swindlers, pirates, and cannibals.'}])
+
+    db.books.aggregate([{
+        $lookup: {
+       from: 'author',
+       localField: 'authorId',
+       foreignField: '_id',
+       as: 'author'
+     }
+   },
+   {
+   $unwind: '$author'
+        },
+   {
+   $unset: 'authorId'
+   }])
+
+db.books.aggregate([{
+ 
+  $group: {
+    _id: "$authorId",
+    countBooks: { $sum: 1 }
+    }
+  }
+])
+
+
+
